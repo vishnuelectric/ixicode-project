@@ -2,6 +2,8 @@ package com.vishnu.solotraveller.ui.main;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.view.PagerAdapter;
@@ -49,7 +51,7 @@ RecommendedDestAdapter recommendedDestAdapter;
         activityComponent().inject(this);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
+checkPermission();
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mMainPresenter.attachView(this);
         mMainPresenter.loadRecommendedDestinations();
@@ -67,6 +69,15 @@ RecommendedDestAdapter recommendedDestAdapter;
         super.onDestroy();
 
         mMainPresenter.detachView();
+    }
+    public void checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.canDrawOverlays(this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, 1);
+            }
+        }
     }
 
     @Override

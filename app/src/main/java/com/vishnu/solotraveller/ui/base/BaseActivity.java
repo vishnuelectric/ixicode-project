@@ -3,16 +3,17 @@ package com.vishnu.solotraveller.ui.base;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
-
-import timber.log.Timber;
 import com.vishnu.solotraveller.BoilerplateApplication;
 import com.vishnu.solotraveller.injection.component.ActivityComponent;
 import com.vishnu.solotraveller.injection.component.ConfigPersistentComponent;
 import com.vishnu.solotraveller.injection.component.DaggerConfigPersistentComponent;
 import com.vishnu.solotraveller.injection.module.ActivityModule;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
+
+import timber.log.Timber;
 
 /**
  * Abstract activity that every other Activity in this application must implement. It handles
@@ -40,7 +41,7 @@ public class BaseActivity extends AppCompatActivity {
         if (!sComponentsMap.containsKey(mActivityId)) {
             Timber.i("Creating new ConfigPersistentComponent id=%d", mActivityId);
             configPersistentComponent = DaggerConfigPersistentComponent.builder()
-                    .applicationComponent(BoilerplateApplication.get(this).getComponent())
+                    .applicationComponent(BoilerplateApplication.get().getComponent())
                     .build();
             sComponentsMap.put(mActivityId, configPersistentComponent);
         } else {

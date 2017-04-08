@@ -1,7 +1,6 @@
 package com.vishnu.solotraveller;
 
 import android.app.Application;
-import android.content.Context;
 
 import com.vishnu.solotraveller.injection.component.ApplicationComponent;
 import com.vishnu.solotraveller.injection.component.DaggerApplicationComponent;
@@ -13,18 +12,20 @@ public class BoilerplateApplication extends Application  {
 
     ApplicationComponent mApplicationComponent;
 
+    public static BoilerplateApplication boilerplateApplication;
+
     @Override
     public void onCreate() {
         super.onCreate();
-
+boilerplateApplication =this;
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
             //Fabric.with(this, new Crashlytics());
         }
     }
 
-    public static BoilerplateApplication get(Context context) {
-        return (BoilerplateApplication) context.getApplicationContext();
+    public static BoilerplateApplication get() {
+        return boilerplateApplication;
     }
 
     public ApplicationComponent getComponent() {
