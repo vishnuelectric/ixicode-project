@@ -7,12 +7,15 @@ import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Build;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.FrameLayout;
 
 import com.vishnu.solotraveller.R;
 
@@ -24,9 +27,10 @@ public class AccessService extends AccessibilityService {
     private final AccessibilityServiceInfo info = new AccessibilityServiceInfo();
     private WindowManager windowManager;
     private View mChatHeadView;
+    private FrameLayout frameLayout;
     private OnEventListener event;
     private boolean isViewShowing= false;
-    private int lastx;
+    private int lastx=0;
     private int lasty =100;
 
     @Override
@@ -112,10 +116,24 @@ public class AccessService extends AccessibilityService {
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.TYPE_PHONE,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
             PixelFormat.TRANSLUCENT);
+        frameLayout = new FrameLayout(this)
+        {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent event) {
+                if (event.getKeyCode() == KeyEvent.KEYCODE_BACK)
+                {
+                    // handle back press
+                    // if (event.getAction() == KeyEvent.ACTION_DOWN)
+                    hideFloatingButtonview();
+                    return true;
+                }
+                return super.dispatchKeyEvent(event);
+            }
+        };
         mChatHeadView = LayoutInflater.from(this).inflate(R.layout.layout_chat_head, null);
-        mChatHeadView.setOnTouchListener(new View.OnTouchListener() {
+        frameLayout.setOnTouchListener(new View.OnTouchListener() {
         private int lastAction;
         private int initialX;
         private int initialY;
@@ -157,7 +175,7 @@ public class AccessService extends AccessibilityService {
                     params.y = initialY + (int) (event.getRawY() - initialTouchY);
 
                     //Update the layout with new X & Y coordinate
-                    windowManager.updateViewLayout(mChatHeadView, params);
+                    windowManager.updateViewLayout(frameLayout, params);
                     lastAction = event.getAction();
                     return false;
             }
@@ -178,14 +196,18 @@ public class AccessService extends AccessibilityService {
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
 
-        windowManager.addView(mChatHeadView, params);
+        frameLayout.addView(mChatHeadView,new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        ));
+
+        windowManager.addView(frameLayout, params);
+
         isViewShowing =true;
 
     }
     private void hideFloatingButtonview()
     {
-        if(mChatHeadView!= null ) {
-            windowManager.removeView(mChatHeadView);
+        if(frameLayout!= null ) {
+            windowManager.removeView(frameLayout);
             isViewShowing =false;
         }
     }
